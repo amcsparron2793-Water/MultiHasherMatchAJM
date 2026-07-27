@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Union
 
-from MultiHasherMatchAJM.Hasher.archive_extractor import ArchiveExtractor
+from MultiHasherMatchAJM.Utilities.archive_extractor import ArchiveExtractor
 from MultiHasherMatchAJM.Hasher.directory_hashers import LargeDirectoryHasher
 from MultiHasherMatchAJM.Hasher.file_hashers import LargeFileHasher
 

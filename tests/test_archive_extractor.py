@@ -1,8 +1,6 @@
 import pytest
-import shutil
 import zipfile
-from pathlib import Path
-from MultiHasherMatchAJM.Hasher.archive_extractor import ArchiveExtractor
+from MultiHasherMatchAJM.Utilities.archive_extractor import ArchiveExtractor
 
 
 @pytest.fixture

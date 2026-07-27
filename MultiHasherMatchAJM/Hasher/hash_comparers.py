@@ -5,9 +5,8 @@ from typing import Union, List, Tuple, Optional
 from MultiHasherMatchAJM import SetupLogger
 from MultiHasherMatchAJM.Hasher.archive_hashers import ArchiveDirectoryHasher
 from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher
-from MultiHasherMatchAJM.Hasher.mismatch_writer import MismatchWriter
+from MultiHasherMatchAJM.Utilities.mismatch_writer import MismatchWriter
 
-# TODO: add _QuickTest class for testing
 from MultiHasherMatchAJM.Hasher.utilities import _QuickTest
 
 
@@ -123,7 +122,6 @@ class _BaseHashComparer(metaclass=ABCMeta):
         return True
 
 
-# TODO: Integrate with AutoBackup
 class JsonToJsonHashComparer(_BaseHashComparer):
     def __init__(self, source_json: Optional[Union[list, dict, Path]],
                  target_json: Optional[Union[list, dict, Path]],

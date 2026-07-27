@@ -1,7 +1,6 @@
 import pytest
 import json
-from pathlib import Path
-from MultiHasherMatchAJM.Hasher.mismatch_writer import MismatchWriter
+from MultiHasherMatchAJM.Utilities.mismatch_writer import MismatchWriter
 
 
 class TestMismatchWriter:

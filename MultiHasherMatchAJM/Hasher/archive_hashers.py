@@ -1,9 +1,9 @@
 from pathlib import Path
 from typing import Union
 
-from AutoBackupAJM.Hasher.archive_extractor import ArchiveExtractor
-from AutoBackupAJM.Hasher.directory_hashers import LargeDirectoryHasher
-from AutoBackupAJM.Hasher.file_hashers import LargeFileHasher
+from MultiHasherMatchAJM.Hasher.archive_extractor import ArchiveExtractor
+from MultiHasherMatchAJM.Hasher.directory_hashers import LargeDirectoryHasher
+from MultiHasherMatchAJM.Hasher.file_hashers import LargeFileHasher
 
 
 class ArchiveFileHasher(LargeFileHasher):

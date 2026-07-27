@@ -6,7 +6,7 @@ from os.path import commonpath
 from pathlib import Path
 from typing import Union, Optional, Generator
 
-from AutoBackupAJM import PROJECT_ROOT, SetupLogger, MISC_PROJECT_DIR
+from MultiHasherMatchAJM import PROJECT_ROOT, SetupLogger, MISC_PROJECT_DIR
 
 
 class _Validators:

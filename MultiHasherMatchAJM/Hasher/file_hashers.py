@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Union, Tuple
 from hashlib import md5
 
-from AutoBackupAJM.Hasher import _BaseHasher
+from MultiHasherMatchAJM.Hasher import _BaseHasher
 
 
 class FileHasher(_BaseHasher):

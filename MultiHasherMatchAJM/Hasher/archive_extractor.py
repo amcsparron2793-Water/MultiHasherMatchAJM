@@ -5,7 +5,7 @@ from tempfile import gettempdir
 from typing import Union
 from itertools import chain
 
-from AutoBackupAJM import SetupLogger
+from MultiHasherMatchAJM import SetupLogger
 
 
 class ArchiveExtractor:

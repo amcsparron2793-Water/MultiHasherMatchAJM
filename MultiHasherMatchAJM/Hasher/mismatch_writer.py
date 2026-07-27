@@ -4,8 +4,9 @@ from os import PathLike
 from pathlib import Path
 from typing import Tuple, Union
 
-from AutoBackupAJM import MISC_PROJECT_DIR, SetupLogger
-from AutoBackupAJM.utilities import Counter
+from CounterAJM import Counter
+
+from MultiHasherMatchAJM import MISC_PROJECT_DIR, SetupLogger
 
 
 class MismatchWriter:

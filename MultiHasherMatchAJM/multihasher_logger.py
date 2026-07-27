@@ -8,7 +8,7 @@ from MultiHasherMatchAJM import PROJECT_ROOT
 class MultiHasherLogger(EasyLogger):
     _PROJECT_ROOT = PROJECT_ROOT
     ROOT_LOG_LOCATION_DEFAULT = _PROJECT_ROOT / 'logs'
-    PROJECT_NAME = 'AutoBackupAJM'
+    PROJECT_NAME = 'MultiHasherMatchAJM'
 
     def __init__(self, **kwargs):
         kwargs.setdefault('project_name', self.__class__.PROJECT_NAME)

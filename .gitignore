@@ -4,3 +4,4 @@ __pycache__
 /venv/
 /dist/
 /*.egg-info/
+/Misc_Project_Files/manual_testing_files/

@@ -8,7 +8,7 @@ from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher
 from MultiHasherMatchAJM.Hasher.mismatch_writer import MismatchWriter
 
 # TODO: add _QuickTest class for testing
-#from MultiHasherMatchAJM.utilities import _QuickTest
+from MultiHasherMatchAJM.Hasher.utilities import _QuickTest
 
 
 class _BaseHashComparer(metaclass=ABCMeta):
@@ -322,16 +322,16 @@ class JsonToDirectoryComparer(_BaseHashComparer):
         return self.jj_hashcomp.compare()
 
 
-# class _ComparersQT(_QuickTest):
-#     HASHER_CLASS_MAP = {
-#         "jj": JsonToJsonHashComparer,
-#         "ja": JsonToArchiveComparer,
-#         "aa": ArchiveToArchiveComparer,
-#         "jd": JsonToDirectoryComparer
-#     }
-#
-#
-# if __name__ == '__main__':
-#     qt = _ComparersQT(hasher_type_code="jd", use_big=True)
-#     qt.get_hc()
-#     qt.compare_test()
+class _ComparersQT(_QuickTest):
+    HASHER_CLASS_MAP = {
+        "jj": JsonToJsonHashComparer,
+        "ja": JsonToArchiveComparer,
+        "aa": ArchiveToArchiveComparer,
+        "jd": JsonToDirectoryComparer
+    }
+
+
+if __name__ == '__main__':
+    qt = _ComparersQT(hasher_type_code="jd", use_big=True)
+    qt.get_hc()
+    qt.compare_test()

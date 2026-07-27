@@ -2,10 +2,10 @@ from abc import ABCMeta, abstractmethod
 from pathlib import Path
 from typing import Union, Optional
 
-from AutoBackupAJM import SetupLogger
-from AutoBackupAJM.Hasher import _BaseHasher
-from AutoBackupAJM.Hasher.directory_hashers import DirectoryHasher
-from AutoBackupAJM.Hasher.file_hashers import FileHasher, LargeFileHasher
+from MultiHasherMatchAJM import SetupLogger
+from MultiHasherMatchAJM.Hasher import _BaseHasher
+from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher
+from MultiHasherMatchAJM.Hasher.file_hashers import FileHasher, LargeFileHasher
 
 
 class _BaseFactoryHasher(_BaseHasher, metaclass=ABCMeta):
@@ -65,4 +65,4 @@ class HasherFactory(_BaseFactoryHasher):
 
 
 if __name__ == "__main__":
-    print(HasherFactory(input_path="../"))
+    print(HasherFactory(input_path="../../"))

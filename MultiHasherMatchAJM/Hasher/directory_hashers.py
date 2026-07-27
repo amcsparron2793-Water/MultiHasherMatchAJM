@@ -4,9 +4,9 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Generator, Tuple, Union, List, Optional, Iterable, Set
 import threading
-from AutoBackupAJM.utilities import Counter
-from AutoBackupAJM.Hasher.file_hashers import FileHasher, LargeFileHasher
-from AutoBackupAJM.Hasher.hash_recorder import HashRecorder
+from MultiHasherMatchAJM.utilities import Counter
+from MultiHasherMatchAJM.Hasher.file_hashers import FileHasher, LargeFileHasher
+from MultiHasherMatchAJM.Hasher.hash_recorder import HashRecorder
 
 
 class DirectoryHasher(FileHasher, HashRecorder):

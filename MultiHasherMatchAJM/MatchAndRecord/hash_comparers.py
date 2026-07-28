@@ -7,6 +7,7 @@ from MultiHasherMatchAJM.Hasher.archive_hashers import ArchiveDirectoryHasher
 from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher
 from MultiHasherMatchAJM.Utilities.mismatch_writer import MismatchWriter
 
+# noinspection PyProtectedMember
 from MultiHasherMatchAJM.Hasher._utilities import _QuickTest
 
 
@@ -330,6 +331,6 @@ class _ComparersQT(_QuickTest):
 
 
 if __name__ == '__main__':
-    qt = _ComparersQT(hasher_type_code="jd", use_big=True)
+    qt = _ComparersQT(hasher_type_code="jd", use_big=False)
     qt.get_hc()
     qt.compare_test()

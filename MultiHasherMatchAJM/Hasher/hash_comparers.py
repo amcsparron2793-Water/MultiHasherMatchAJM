@@ -7,7 +7,7 @@ from MultiHasherMatchAJM.Hasher.archive_hashers import ArchiveDirectoryHasher
 from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher
 from MultiHasherMatchAJM.Utilities.mismatch_writer import MismatchWriter
 
-from MultiHasherMatchAJM.Hasher.utilities import _QuickTest
+from MultiHasherMatchAJM.Hasher._utilities import _QuickTest
 
 
 class _BaseHashComparer(metaclass=ABCMeta):

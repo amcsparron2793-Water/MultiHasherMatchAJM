@@ -5,7 +5,7 @@ from typing import Union, Optional
 from MultiHasherMatchAJM import SetupLogger
 from MultiHasherMatchAJM.Hasher import _BaseHasher
 from MultiHasherMatchAJM.Hasher.archive_hashers import ArchiveDirectoryHasher
-from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher
+from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher, LargeDirectoryHasher
 from MultiHasherMatchAJM.Hasher.file_hashers import FileHasher, LargeFileHasher
 
 
@@ -27,11 +27,16 @@ class HasherFactory(_BaseFactoryHasher):
     FILE_HASHER_CLASS = FileHasher
     LARGE_FILE_HASHER_CLASS = LargeFileHasher
     DIRECTORY_HASHER_CLASS = DirectoryHasher
+    LARGE_DIRECTORY_HASHER_CLASS = LargeDirectoryHasher
     ARCHIVE_HASHER_CLASS = ArchiveDirectoryHasher
 
     @classmethod
     def _is_large_file(cls, file_path: Path) -> bool:
         return Path(file_path).stat().st_size > cls.LARGE_FILE_HASHER_CLASS.WARNING_BUFFER_SIZE
+
+    @classmethod
+    def _is_large_directory(cls, directory_path: Path) -> bool:
+        return Path(directory_path).stat().st_size > cls.LARGE_DIRECTORY_HASHER_CLASS.WARNING_BUFFER_SIZE
 
     @classmethod
     def inst_file_hasher_class(cls, file_path: Path, **kwargs):
@@ -41,6 +46,8 @@ class HasherFactory(_BaseFactoryHasher):
 
     @classmethod
     def inst_directory_hasher_class(cls, directory_path: Path, **kwargs):
+        if cls._is_large_directory(Path(directory_path)):
+            return cls.LARGE_DIRECTORY_HASHER_CLASS(directory_path, **kwargs)
         return cls.DIRECTORY_HASHER_CLASS(directory_path, **kwargs)
 
     @classmethod

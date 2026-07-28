@@ -1,6 +1,6 @@
 import pytest
 import logging
-from MultiHasherMatchAJM.multihasher_logger import MultiHasherLogger, SetupLogger
+from MultiHasherMatchAJM.Utilities.multihasher_logger import MultiHasherLogger, SetupLogger
 
 
 class TestMultiHasherLogger:
@@ -51,7 +51,7 @@ class TestSetupLogger:
         # We need to mock hasHandlers to return False because pytest adds handlers
         import unittest.mock as mock
         # We MUST mock MultiHasherMatchAJM.multihasher_logger.basicConfig because it was imported with 'from'
-        with mock.patch("MultiHasherMatchAJM.multihasher_logger.basicConfig") as mock_basic_config:
+        with mock.patch("MultiHasherMatchAJM.Utilities.multihasher_logger.basicConfig") as mock_basic_config:
             with mock.patch.object(no_handler_logger, 'hasHandlers', return_value=False):
                 with mock.patch.object(no_handler_logger, 'info') as mock_info:
                     logger = SetupLogger._check_fallback_logger_config(logger=no_handler_logger)

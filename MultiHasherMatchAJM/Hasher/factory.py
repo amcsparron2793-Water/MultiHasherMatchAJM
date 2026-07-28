@@ -4,6 +4,7 @@ from typing import Union, Optional
 
 from MultiHasherMatchAJM import SetupLogger
 from MultiHasherMatchAJM.Hasher import _BaseHasher
+from MultiHasherMatchAJM.Hasher.archive_hashers import ArchiveDirectoryHasher
 from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher
 from MultiHasherMatchAJM.Hasher.file_hashers import FileHasher, LargeFileHasher
 
@@ -26,7 +27,7 @@ class HasherFactory(_BaseFactoryHasher):
     FILE_HASHER_CLASS = FileHasher
     LARGE_FILE_HASHER_CLASS = LargeFileHasher
     DIRECTORY_HASHER_CLASS = DirectoryHasher
-    ARCHIVE_HASHER_CLASS = None  # TODO: implement
+    ARCHIVE_HASHER_CLASS = ArchiveDirectoryHasher
 
     @classmethod
     def _is_large_file(cls, file_path: Path) -> bool:
@@ -43,12 +44,19 @@ class HasherFactory(_BaseFactoryHasher):
         return cls.DIRECTORY_HASHER_CLASS(directory_path, **kwargs)
 
     @classmethod
+    def inst_archive_hasher_class(cls, archive_path: Path, **kwargs):
+        return cls.ARCHIVE_HASHER_CLASS(archive_path, **kwargs)
+
+    @classmethod
     def inst_hasher_class(cls, input_path: Union[str, Path], **kwargs):
         if not isinstance(input_path, Path):
             input_path: Path = Path(input_path)
 
         if input_path.is_file():
+            if input_path.suffix in cls.ARCHIVE_HASHER_CLASS.ARCHIVE_FILE_TYPES:
+                return cls.inst_archive_hasher_class(input_path, **kwargs)
             return cls.inst_file_hasher_class(input_path, **kwargs)
+
         elif input_path.is_dir():
             return cls.inst_directory_hasher_class(input_path, **kwargs)
         else:
@@ -65,4 +73,5 @@ class HasherFactory(_BaseFactoryHasher):
 
 
 if __name__ == "__main__":
-    print(HasherFactory(input_path="../../"))
+    from MultiHasherMatchAJM import MANUAL_TEST_FILE_LOCATION
+    print(HasherFactory(input_path=MANUAL_TEST_FILE_LOCATION / "HostedFeatureStorage.zip"))

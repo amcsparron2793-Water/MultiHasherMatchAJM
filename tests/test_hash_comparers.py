@@ -1,7 +1,7 @@
 import json
 # noinspection PyPackageRequirements
 import pytest
-from MultiHasherMatchAJM.Hasher.hash_comparers import JsonToJsonHashComparer, JsonToArchiveComparer
+from MultiHasherMatchAJM.MatchAndRecord.hash_comparers import JsonToJsonHashComparer, JsonToArchiveComparer
 from unittest.mock import patch
 
 
@@ -49,7 +49,7 @@ class TestJsonToJsonHashComparer:
 
 
 class TestJsonToArchiveComparer:
-    @patch("MultiHasherMatchAJM.Hasher.hash_comparers.ArchiveDirectoryHasher")
+    @patch("MultiHasherMatchAJM.MatchAndRecord.hash_comparers.ArchiveDirectoryHasher")
     def test_init(self, mock_hasher, tmp_path):
         archive_path = tmp_path / "test.zip"
         archive_path.touch()
@@ -62,7 +62,7 @@ class TestJsonToArchiveComparer:
         assert comparer.delay_hashing is True
         mock_hasher.assert_called_once()
 
-    @patch("MultiHasherMatchAJM.Hasher.hash_comparers.ArchiveDirectoryHasher")
+    @patch("MultiHasherMatchAJM.MatchAndRecord.hash_comparers.ArchiveDirectoryHasher")
     def test_delay_hashing_setter(self, mock_hasher, tmp_path):
         archive_path = tmp_path / "test.zip"
         archive_path.touch()
@@ -71,7 +71,7 @@ class TestJsonToArchiveComparer:
         comparer.delay_hashing = False
         assert comparer.delay_hashing is False
 
-    # @patch("MultiHasherMatchAJM.Hasher.hash_comparers.ArchiveDirectoryHasher")
+    # @patch("MultiHasherMatchAJM.MatchAndRecord.hash_comparers.ArchiveDirectoryHasher")
     # def test_target_json_locked(self, mock_hasher, tmp_path):
     #     archive_path = tmp_path / "test.zip"
     #     archive_path.touch()
@@ -85,7 +85,7 @@ class TestJsonToArchiveComparer:
     #     # Wait, the setter doesn't set anything.
     #     assert comparer.target_json is None
 
-    @patch("MultiHasherMatchAJM.Hasher.hash_comparers.ArchiveDirectoryHasher")
+    @patch("MultiHasherMatchAJM.MatchAndRecord.hash_comparers.ArchiveDirectoryHasher")
     def test_compare_triggers_hashing(self, mock_hasher, tmp_path):
         archive_path = tmp_path / "test.zip"
         archive_path.touch()
@@ -102,7 +102,7 @@ class TestJsonToArchiveComparer:
         #assert comparer.delay_hashing is False
         mock_hasher_instance.hash_archive.assert_called_once()
 
-    @patch("MultiHasherMatchAJM.Hasher.hash_comparers.ArchiveDirectoryHasher")
+    @patch("MultiHasherMatchAJM.MatchAndRecord.hash_comparers.ArchiveDirectoryHasher")
     def test_compare_without_delay(self, mock_hasher, tmp_path):
         archive_path = tmp_path / "test.zip"
         archive_path.touch()

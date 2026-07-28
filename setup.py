@@ -23,7 +23,8 @@ def get_property(prop, project):
 setup(
     name=project_name,
     version=get_property('__version__', project_name),
-    packages=['MultiHasherMatchAJM'],
+    packages=['MultiHasherMatchAJM', 'MultiHasherMatchAJM.Hasher',
+              'MultiHasherMatchAJM.MatchAndRecord', 'MultiHasherMatchAJM.Utilities'],
     url='https://github.com/amcsparron2793-Water/MultiHasherMatchAJM',
     download_url=f'https://github.com/amcsparron2793-Water/MultiHasherMatchAJM/archive/refs/tags/{get_property("__version__", project_name)}.tar.gz',
     keywords=[],

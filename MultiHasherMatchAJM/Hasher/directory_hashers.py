@@ -2,11 +2,11 @@ from tqdm import tqdm
 from CounterAJM import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import Generator, Tuple, Union, List, Optional, Iterable, Set
+from typing import Generator, Tuple, Union, List, Optional, Iterable
 import threading
 
 from MultiHasherMatchAJM.Hasher.file_hashers import FileHasher, LargeFileHasher
-from MultiHasherMatchAJM.Hasher.hash_recorder import HashRecorder
+from MultiHasherMatchAJM.MatchAndRecord.hash_recorder import HashRecorder
 
 
 class DirectoryHasher(FileHasher, HashRecorder):

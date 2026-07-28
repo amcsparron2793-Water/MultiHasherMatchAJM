@@ -1,7 +1,8 @@
 import pytest
 import json
 from pathlib import Path
-from MultiHasherMatchAJM.Hasher.hash_recorder import HashRecorder, _Validators, _Recorder
+from MultiHasherMatchAJM.MatchAndRecord.hash_recorder import HashRecorder, _Validators
+
 
 class TestValidators:
     @pytest.fixture
@@ -30,6 +31,7 @@ class TestValidators:
         with pytest.raises(TypeError):
             validators._validate_record_save_dir(tmp_path / "file.txt")
 
+
 class MockRecorder(HashRecorder):
     def __init__(self, hashes=None, **kwargs):
         super().__init__(**kwargs)
@@ -39,28 +41,29 @@ class MockRecorder(HashRecorder):
         for h in self.hashes:
             yield h
 
+
 class TestHashRecorder:
     def test_hash_and_record_directory(self, tmp_path):
         save_dir = tmp_path / "hashes"
         file_name = "test_hashes.json"
-        
+
         # We need to simulate some files.
         # Path.relative_to will be used.
         f1 = tmp_path / "file1.txt"
         f1.touch()
-        
+
         recorder = MockRecorder(
             hashes=[(f1, "hash1")],
             record_save_dir=save_dir,
             file_name=file_name,
             input_path=tmp_path
         )
-        
+
         records = recorder.hash_and_record_directory(relative_to=tmp_path, filename=file_name)
-        
+
         assert "hash1" in records
         assert records["hash1"] == "file1.txt"
-        
+
         # Check if file was written
         record_path = save_dir / file_name
         assert record_path.exists()
@@ -74,7 +77,7 @@ class TestHashRecorder:
         d1.mkdir()
         f1 = d1 / "file1.txt"
         f1.touch()
-        
+
         # If we DON'T specify file_name, it should use common dir name
         recorder = MockRecorder(
             hashes=[(f1, "hash1")],
@@ -83,15 +86,15 @@ class TestHashRecorder:
         )
         # We need to trigger common dir logic. _record_directory does it.
         # hash_and_record_directory calls _record_and_cleanup which calls _record_directory
-        
+
         # By default _Recorder has a DEFAULT_FILE_NAME
         # But _validate_common_dir_filename might override it if filename is not passed to it.
-        
+
         records = recorder.hash_and_record_directory(relative_to=d1)
-        
+
         # The common path of [f1] relative to d1 is "file1.txt"
         # commonpath(["file1.txt"]) is "file1.txt" -> parent -> "."
-        
+
         # Let's try multiple files in a subdir
         sub = d1 / "subdir"
         sub.mkdir()
@@ -99,7 +102,7 @@ class TestHashRecorder:
         f2.touch()
         f3 = sub / "file3.txt"
         f3.touch()
-        
+
         recorder = MockRecorder(
             hashes=[(f2, "hash2"), (f3, "hash3")],
             record_save_dir=tmp_path,
@@ -107,6 +110,6 @@ class TestHashRecorder:
         )
         # records should be {"hash2": "subdir/file2.txt", "hash3": "subdir/file3.txt"}
         # common path of ["subdir/file2.txt", "subdir/file3.txt"] is "subdir"
-        
+
         recorder.hash_and_record_directory(relative_to=d1)
         assert recorder.file_name == Path("subdir.json")

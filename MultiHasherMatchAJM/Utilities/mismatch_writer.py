@@ -31,6 +31,8 @@ class MismatchWriter:
         # this is purposely set this way so that it cant be changed after initialization
         self._append_timestamp_to_file_name = kwargs.get("append_timestamp_to_file_name", True)
 
+        self._create_mismatch_location = kwargs.get("create_mismatch_location", True)
+
         self.mismatch_file_name = kwargs.get("mismatch_file_name",
                                              self.__class__.DEFAULT_MISMATCH_FILE_NAME)
         self.mismatch_file_location = kwargs.get("mismatch_file_location",
@@ -92,10 +94,16 @@ class MismatchWriter:
         return "file" if Path(self.mismatch_target).suffix else "directory"
 
     def write_mismatches(self, **kwargs):
+        create_mismatch_location = kwargs.get("create_mismatch_location", self._create_mismatch_location)
+
         if not self.mismatch_dict:
             self.logger.debug("No mismatches to write")
             return
         try:
+            if create_mismatch_location:
+                self.mismatch_file_location.mkdir(parents=True, exist_ok=True)
+                self.logger.debug(f"Created directory {self.mismatch_file_location} for mismatches.")
+
             with open(self.mismatch_file_path, "w") as f:
                 json.dump(self.mismatch_dict, f, indent=4)
             self.logger.info(f"Mismatches written to {self.mismatch_file_path}")

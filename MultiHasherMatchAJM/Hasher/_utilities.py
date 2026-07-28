@@ -86,7 +86,7 @@ class _QuickTest:
     def get_hc(self, **kwargs):
         self.class_to_use = kwargs.pop("class_to_use", self.class_to_use)
 
-        kwargs.setdefault('mismatch_file_location', Path(MANUAL_TEST_FILE_LOCATION))
+        kwargs.setdefault('mismatch_file_location', Path(MANUAL_TEST_FILE_LOCATION / 'mismatches'))
         kwargs.setdefault('record_save_dir', Path(MANUAL_TEST_FILE_LOCATION))
 
         if self._jj:

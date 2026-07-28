@@ -1,10 +1,10 @@
 import json
 from abc import abstractmethod, ABCMeta
 from pathlib import Path
-from typing import Union, List, Tuple, Optional
+from typing import Union, List, Tuple, Optional, Any
 from MultiHasherMatchAJM import SetupLogger
-from MultiHasherMatchAJM.Hasher.archive_hashers import ArchiveDirectoryHasher
-from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher
+# from MultiHasherMatchAJM.Hasher.archive_hashers import ArchiveDirectoryHasher
+# from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher
 from MultiHasherMatchAJM.Utilities.mismatch_writer import MismatchWriter
 
 # noinspection PyProtectedMember
@@ -243,7 +243,8 @@ class JsonToArchiveComparer(_BaseHashComparer):
         # noinspection PyTypeChecker
         return self._archive_hash
 
-    def setup_archive_hasher(self, archive_file: Path, **kwargs) -> Tuple[Path, ArchiveDirectoryHasher, dict]:
+    def setup_archive_hasher(self, archive_file: Path, **kwargs) -> Tuple[Path, Any, dict]:
+        from MultiHasherMatchAJM.Hasher.archive_hashers import ArchiveDirectoryHasher
         kwargs.setdefault('unzip_and_hash_contents', True)
         kwargs.setdefault('preserve_archive', False)
         archive_hasher = ArchiveDirectoryHasher(input_path=archive_file, **kwargs)
@@ -289,6 +290,7 @@ class ArchiveToArchiveComparer(JsonToArchiveComparer, _BaseHashComparer):
 
 class JsonToDirectoryComparer(_BaseHashComparer):
     def __init__(self, source_json: Path, target_dir: Path, **kwargs):
+        from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher
         super().__init__(**kwargs)
         kwargs.setdefault('logger', self.logger)
         self._delay_hashing = None
@@ -302,7 +304,8 @@ class JsonToDirectoryComparer(_BaseHashComparer):
                                                   target_json=None if self.delay_hashing else self.directory_hash,
                                                   **kwargs)
 
-        self.source_name = self.source_json.name
+        if isinstance(self.source_json, Path):
+            self.source_name = self.source_json.name
         self.target_name = self.target_dir.name
 
     @property

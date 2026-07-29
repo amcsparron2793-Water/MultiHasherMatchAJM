@@ -291,7 +291,6 @@ class JsonToDirectoryComparer(_BaseHashComparer):
     def __init__(self, source_json: Path, target_dir: Path, **kwargs):
         super().__init__(**kwargs)
         kwargs.setdefault('logger', self.logger)
-        self._delay_hashing = None
         self._directory_hash = None
 
         self.source_json = source_json

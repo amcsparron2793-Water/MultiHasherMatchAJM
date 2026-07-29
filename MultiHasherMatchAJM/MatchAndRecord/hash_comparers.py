@@ -3,6 +3,7 @@ from abc import abstractmethod, ABCMeta
 from pathlib import Path
 from typing import Union, List, Tuple, Optional, Any
 from MultiHasherMatchAJM import SetupLogger
+# these are imported on the fly to avoid circular imports
 # from MultiHasherMatchAJM.Hasher.archive_hashers import ArchiveDirectoryHasher
 # from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher
 from MultiHasherMatchAJM.Utilities.mismatch_writer import MismatchWriter
@@ -293,7 +294,6 @@ class JsonToDirectoryComparer(_BaseHashComparer):
         from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher
         super().__init__(**kwargs)
         kwargs.setdefault('logger', self.logger)
-        self._delay_hashing = None
         self._directory_hash = None
 
         self.source_json = source_json

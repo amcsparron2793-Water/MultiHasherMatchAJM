@@ -6,6 +6,8 @@ from MultiHasherMatchAJM.MatchAndRecord import hash_comparers
 
 
 class ComparerFactory:
+    FALLBACK_ARCHIVE_TYPES = ['.zip', '.tar', '.tar.gz', '.tar.bz2', '.7z', '.rar']
+
     @classmethod
     def _is_json_input(cls, val: Any) -> bool:
         if isinstance(val, (dict, list)):
@@ -28,7 +30,7 @@ class ComparerFactory:
                 return p.is_file() and p.suffix.lower() in ArchiveFileHasher.ARCHIVE_FILE_TYPES
             except (OSError, ImportError):
                 # Fallback to common archive types if import fails or other error
-                return p.is_file() and p.suffix.lower() in ['.zip', '.tar', '.tar.gz', '.tar.bz2', '.7z', '.rar']
+                return p.is_file() and p.suffix.lower() in cls.FALLBACK_ARCHIVE_TYPES
         return False
 
     @classmethod

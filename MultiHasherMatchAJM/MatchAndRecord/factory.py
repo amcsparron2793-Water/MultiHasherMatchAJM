@@ -1,3 +1,4 @@
+from os import PathLike
 from pathlib import Path
 from typing import Any
 
@@ -44,6 +45,22 @@ class ComparerFactory:
         return False
 
     @classmethod
+    def _input_type_str(cls, val: PathLike) -> str:
+        if isinstance(val, PathLike):
+            val: Path = Path(val)
+
+            if val.is_file() or val.suffix:
+                if cls._is_archive_input(val):
+                    return f"{val.suffix} archive"
+                return f"{val.suffix} file"
+
+            elif val.is_dir() or not val.suffix:
+                return "directory"
+            else:
+                return "unknown"
+        return type(val).__name__
+
+    @classmethod
     def inst_comparer_class(cls, source: Any, target: Any, **kwargs):
         # Determine types
         is_source_json = cls._is_json_input(source)
@@ -67,7 +84,8 @@ class ComparerFactory:
                 return hash_comparers.ArchiveToArchiveComparer(source_archive_file=Path(source), 
                                                                target_archive_file=Path(target), **kwargs)
 
-        raise ValueError(f"Could not determine a comparer for source type {type(source)} and target type {type(target)}")
+        raise ValueError(f"Could not determine a comparer for source type {cls._input_type_str(source)} "
+                         f"and target type {cls._input_type_str(target)}")
 
     def __new__(cls, source: Any, target: Any, **kwargs):
         kwargs["logger"] = SetupLogger.setup_logger(**kwargs)
@@ -77,6 +95,7 @@ class ComparerFactory:
 if __name__ == "__main__":
     from MultiHasherMatchAJM import MANUAL_TEST_FILE_LOCATION
     # Example usage (would need actual files to run)
-    comparer = ComparerFactory(source=Path(MANUAL_TEST_FILE_LOCATION / "Desktop_Backup.json"),
-                               target=Path("~/Desktop").expanduser())
+    # FIXME: target and source should both allow for directory inputs - currently only source allows for directories.
+    comparer = ComparerFactory(target=Path(MANUAL_TEST_FILE_LOCATION / "Desktop_Backup.json"),
+                               source=Path("~/Desktop").expanduser())
     print(type(comparer))

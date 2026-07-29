@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Union, Optional, Any
+from typing import Any
 
 from MultiHasherMatchAJM import SetupLogger
 from MultiHasherMatchAJM.MatchAndRecord import hash_comparers
@@ -75,7 +75,8 @@ class ComparerFactory:
 
 
 if __name__ == "__main__":
+    from MultiHasherMatchAJM import MANUAL_TEST_FILE_LOCATION
     # Example usage (would need actual files to run)
-    # comparer = ComparerFactory(source="path/to/source.json", target="path/to/target.zip")
-    # print(type(comparer))
-    pass
+    comparer = ComparerFactory(source=Path(MANUAL_TEST_FILE_LOCATION / "Desktop_Backup.json"),
+                               target=Path("~/Desktop").expanduser())
+    print(type(comparer))

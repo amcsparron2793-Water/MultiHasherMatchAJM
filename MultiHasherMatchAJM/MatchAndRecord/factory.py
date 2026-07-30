@@ -6,10 +6,7 @@ from MultiHasherMatchAJM import SetupLogger
 from MultiHasherMatchAJM.MatchAndRecord import hash_comparers
 
 
-class ComparerFactory:
-    JSON_SUFFIX = ".json"
-    FALLBACK_ARCHIVE_TYPES = ['.zip', '.tar', '.tar.gz', '.tar.bz2', '.7z', '.rar']
-
+class _PathHelpers:
     @staticmethod
     def _as_path(value: Any) -> Optional[Path]:
         if isinstance(value, (str, Path)):
@@ -28,6 +25,28 @@ class ComparerFactory:
         if isinstance(source, (str, Path)):
             return Path(source)
         return source
+
+
+class _InputHelpers(_PathHelpers):
+    FALLBACK_ARCHIVE_TYPES = ['.zip', '.tar', '.tar.gz', '.tar.bz2', '.7z', '.rar']
+    JSON_SUFFIX = ".json"
+
+    @classmethod
+    def _input_type_str(cls, value: PathLike) -> str:
+        path = cls._as_path(value)
+        if path is None:
+            return type(value).__name__
+
+        if cls._is_archive_input(path):
+            return f"{path.suffix} archive"
+
+        if cls._path_exists_as(path, "is_file") or path.suffix:
+            return f"{path.suffix} file"
+
+        if cls._path_exists_as(path, "is_dir") or not path.suffix:
+            return "directory"
+
+        return "unknown"
 
     @classmethod
     def _archive_file_types(cls) -> list[str]:
@@ -63,22 +82,12 @@ class ComparerFactory:
         path = cls._as_path(value)
         return path is not None and cls._path_exists_as(path, "is_dir")
 
-    @classmethod
-    def _input_type_str(cls, value: PathLike) -> str:
-        path = cls._as_path(value)
-        if path is None:
-            return type(value).__name__
 
-        if cls._is_archive_input(path):
-            return f"{path.suffix} archive"
-
-        if cls._path_exists_as(path, "is_file") or path.suffix:
-            return f"{path.suffix} file"
-
-        if cls._path_exists_as(path, "is_dir") or not path.suffix:
-            return "directory"
-
-        return "unknown"
+class ComparerFactory(_InputHelpers):
+    _JSON_SOURCE_JSON_TARGET_CLS = hash_comparers.JsonToJsonHashComparer
+    _JSON_SOURCE_ARCHIVE_TARGET_CLS = hash_comparers.JsonToArchiveComparer
+    _JSON_SOURCE_DIRECTORY_TARGET_CLS = hash_comparers.JsonToDirectoryComparer
+    _ARCHIVE_SOURCE_ARCHIVE_TARGET_CLS = hash_comparers.ArchiveToArchiveComparer
 
     @classmethod
     def _json_src_targets(cls, source: Any, target: Any, **kwargs):
@@ -87,21 +96,21 @@ class ComparerFactory:
         target_is_directory = cls._is_directory_input(target)
 
         if target_is_json:
-            return hash_comparers.JsonToJsonHashComparer(
+            return cls._JSON_SOURCE_JSON_TARGET_CLS(
                 source_json=source,
                 target_json=target,
                 **kwargs,
             )
 
         if target_is_archive:
-            return hash_comparers.JsonToArchiveComparer(
+            return cls._JSON_SOURCE_ARCHIVE_TARGET_CLS(
                 source_json=source,
                 archive_file=Path(target),
                 **kwargs,
             )
 
         if target_is_directory:
-            return hash_comparers.JsonToDirectoryComparer(
+            return cls._JSON_SOURCE_DIRECTORY_TARGET_CLS(
                 source_json=cls._json_source_for_path_consumer(source),
                 target_dir=Path(target),
                 **kwargs,

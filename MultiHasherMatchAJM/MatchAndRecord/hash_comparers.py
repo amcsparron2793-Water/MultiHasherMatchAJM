@@ -320,6 +320,14 @@ class JsonToDirectoryComparer(_BaseHashComparer):
         return self.jj_hashcomp.compare()
 
 
+class ArchiveToDirectoryComparer(JsonToDirectoryComparer, _BaseHashComparer):
+    def __init__(self, source_archive_file: Path, target_dir: Path, **kwargs):
+        self.source_archive_file = source_archive_file
+        self.target_dir = target_dir
+        # TODO: get source archive hash
+        super().__init__(source_json=source_archive_file, target_dir=self.target_dir, **kwargs)
+
+
 class _ComparersQT(_QuickTest):
     HASHER_CLASS_MAP = {
         "jj": JsonToJsonHashComparer,

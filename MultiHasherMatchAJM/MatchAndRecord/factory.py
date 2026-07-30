@@ -20,12 +20,6 @@ class _PathHelpers:
         except OSError:
             return False
 
-    @classmethod
-    def _json_source_for_path_consumer(cls, source: Any) -> Any:
-        if isinstance(source, (str, Path)):
-            return Path(source)
-        return source
-
 
 class _InputHelpers(_PathHelpers):
     FALLBACK_ARCHIVE_TYPES = ['.zip', '.tar', '.tar.gz', '.tar.bz2', '.7z', '.rar']
@@ -111,7 +105,7 @@ class ComparerFactory(_InputHelpers):
 
         if target_is_directory:
             return cls._JSON_SOURCE_DIRECTORY_TARGET_CLS(
-                source_json=cls._json_source_for_path_consumer(source),
+                source_json=Path(source) if isinstance(source, str) else source,
                 target_dir=Path(target),
                 **kwargs,
             )

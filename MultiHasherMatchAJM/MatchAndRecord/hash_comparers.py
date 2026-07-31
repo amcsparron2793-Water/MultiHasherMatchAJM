@@ -196,11 +196,17 @@ class JsonToJsonHashComparer(_BaseHashComparer):
         self._source_json = self._get_json(value)
 
     def _all_source_in_target(self):
+        if self.source_json is None or self.target_json is None:
+            self.logger.warning("source_json or target_json is None, cannot compare.")
+            return False
         return self._all_x_keys_in_y_keys(x=self.source_json,
                                           y=self.target_json,
                                           y_name=self.target_name)
 
     def _all_target_in_source(self):
+        if self.source_json is None or self.target_json is None:
+            self.logger.warning("source_json or target_json is None, cannot compare.")
+            return False
         return self._all_x_keys_in_y_keys(x=self.target_json,
                                           y=self.source_json,
                                           y_name=self.source_name)
@@ -209,7 +215,16 @@ class JsonToJsonHashComparer(_BaseHashComparer):
         return self._all_source_in_target() and self._all_target_in_source()
 
 
-class JsonToArchiveComparer(_BaseHashComparer):
+class _ArchiveHandlerMixin:
+    def setup_archive_hasher(self, archive_file: Path, **kwargs) -> Tuple[Path, ArchiveDirectoryHasher, dict]:
+        kwargs.setdefault('unzip_and_hash_contents', True)
+        kwargs.setdefault('preserve_archive', False)
+        archive_hasher = ArchiveDirectoryHasher(input_path=archive_file, **kwargs)
+        self.logger.info(f"Archive hasher initialized for {archive_file.name}")
+        return archive_file, archive_hasher, kwargs
+
+
+class JsonToArchiveComparer(_ArchiveHandlerMixin, _BaseHashComparer):
     def __init__(self, archive_file: Path, source_json: Union[Path, List[dict], dict], **kwargs):
         # kwargs.setdefault('delay_hashing', True)
         super().__init__(**kwargs)
@@ -242,13 +257,6 @@ class JsonToArchiveComparer(_BaseHashComparer):
             self._archive_hash = self.archive_hasher.hash_archive()
         # noinspection PyTypeChecker
         return self._archive_hash
-
-    def setup_archive_hasher(self, archive_file: Path, **kwargs) -> Tuple[Path, ArchiveDirectoryHasher, dict]:
-        kwargs.setdefault('unzip_and_hash_contents', True)
-        kwargs.setdefault('preserve_archive', False)
-        archive_hasher = ArchiveDirectoryHasher(input_path=archive_file, **kwargs)
-        self.logger.info(f"Archive hasher initialized for {archive_file.name}")
-        return archive_file, archive_hasher, kwargs
 
 
 class ArchiveToArchiveComparer(JsonToArchiveComparer, _BaseHashComparer):
@@ -289,7 +297,11 @@ class ArchiveToArchiveComparer(JsonToArchiveComparer, _BaseHashComparer):
 
 class JsonToDirectoryComparer(_BaseHashComparer):
     def __init__(self, source_json: Path, target_dir: Path, **kwargs):
-        super().__init__(**kwargs)
+        # Modified `JsonToDirectoryComparer.__init__` and `ArchiveToDirectoryComparer.__init__`
+        # to use explicit base class initialization (`_BaseHashComparer.__init__`)
+        # instead of `super().__init__` where needed to avoid `TypeError`
+        # from `JsonToArchiveComparer`'s positional arguments.
+        _BaseHashComparer.__init__(self, **kwargs)
         kwargs.setdefault('logger', self.logger)
         self._directory_hash = None
 
@@ -301,7 +313,8 @@ class JsonToDirectoryComparer(_BaseHashComparer):
                                                   target_json=None if self.delay_hashing else self.directory_hash,
                                                   **kwargs)
 
-        self.source_name = self.source_json.name
+        if self.source_json is not None:
+            self.source_name = self.source_json.name
         self.target_name = self.target_dir.name
 
     @property

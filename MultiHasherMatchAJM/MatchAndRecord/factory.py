@@ -154,4 +154,4 @@ if __name__ == "__main__":
     # FIXME: target and source should both allow for directory inputs - currently only source allows for directories.
     comparer = ComparerFactory(target=Path(MANUAL_TEST_FILE_LOCATION / "Desktop_Backup.json"),
                                source=Path("~/Desktop").expanduser())
-    print(type(comparer))
+    print(f"factory returning: {type(comparer).__name__}")

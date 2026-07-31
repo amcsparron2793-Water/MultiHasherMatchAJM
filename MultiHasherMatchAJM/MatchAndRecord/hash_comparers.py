@@ -123,6 +123,15 @@ class _BaseHashComparer(metaclass=ABCMeta):
         return True
 
 
+class _ArchiveHandlerMixin:
+    def setup_archive_hasher(self, archive_file: Path, **kwargs) -> Tuple[Path, ArchiveDirectoryHasher, dict]:
+        kwargs.setdefault('unzip_and_hash_contents', True)
+        kwargs.setdefault('preserve_archive', False)
+        archive_hasher = ArchiveDirectoryHasher(input_path=archive_file, **kwargs)
+        self.logger.info(f"Archive hasher initialized for {archive_file.name}")
+        return archive_file, archive_hasher, kwargs
+
+
 class JsonToJsonHashComparer(_BaseHashComparer):
     def __init__(self, source_json: Optional[Union[list, dict, Path]],
                  target_json: Optional[Union[list, dict, Path]],
@@ -213,15 +222,6 @@ class JsonToJsonHashComparer(_BaseHashComparer):
 
     def source_target_contents_match(self):
         return self._all_source_in_target() and self._all_target_in_source()
-
-
-class _ArchiveHandlerMixin:
-    def setup_archive_hasher(self, archive_file: Path, **kwargs) -> Tuple[Path, ArchiveDirectoryHasher, dict]:
-        kwargs.setdefault('unzip_and_hash_contents', True)
-        kwargs.setdefault('preserve_archive', False)
-        archive_hasher = ArchiveDirectoryHasher(input_path=archive_file, **kwargs)
-        self.logger.info(f"Archive hasher initialized for {archive_file.name}")
-        return archive_file, archive_hasher, kwargs
 
 
 class JsonToArchiveComparer(_ArchiveHandlerMixin, _BaseHashComparer):

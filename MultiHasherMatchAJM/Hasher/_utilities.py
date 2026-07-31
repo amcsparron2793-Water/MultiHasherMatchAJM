@@ -10,6 +10,7 @@ class _ValidHasherCodes(Enum):
     JA = "ja"
     AA = "aa"
     JD = "jd"
+    AD = "ad"
 
 
 class _QuickTest:
@@ -31,6 +32,7 @@ class _QuickTest:
         self._ja = False
         self._aa = False
         self._jd = False
+        self._ad = False
 
         self._class_to_use = None
         self.hc = None
@@ -107,6 +109,11 @@ class _QuickTest:
             src_json = self.__class__.TEST_DIR_JSON if not self._use_big else self.__class__.TEST_BIG_DIR_JSON
             target_dir = self.__class__.TEST_TARGET_DIR if not self._use_big else self.__class__.TEST_BIG_TARGET_DIR
             self.hc = self.class_to_use(source_json=src_json,
+                                        target_dir=target_dir,
+                                        **kwargs)
+        elif self._ad:
+            target_dir = self.__class__.TEST_TARGET_DIR if not self._use_big else self.__class__.TEST_BIG_TARGET_DIR
+            self.hc = self.class_to_use(archive_file=self.__class__.TEST_NEW_ZIP,
                                         target_dir=target_dir,
                                         **kwargs)
 

@@ -333,12 +333,43 @@ class JsonToDirectoryComparer(_BaseHashComparer):
         return self.jj_hashcomp.compare()
 
 
-class ArchiveToDirectoryComparer(JsonToDirectoryComparer, _BaseHashComparer):
-    def __init__(self, source_archive_file: Path, target_dir: Path, **kwargs):
-        self.source_archive_file = source_archive_file
+class ArchiveToDirectoryComparer(JsonToDirectoryComparer, JsonToArchiveComparer, _ArchiveHandlerMixin, _BaseHashComparer):
+    def __init__(self, archive_file: Path, target_dir: Path, **kwargs):
+        self._archive_hash = None
+        self._delay_hashing = None
+
+        _BaseHashComparer.__init__(self, **kwargs)
+        kwargs.setdefault('logger', self.logger)
+
+        self.archive_file = archive_file
         self.target_dir = target_dir
-        # TODO: get source archive hash
-        super().__init__(source_json=source_archive_file, target_dir=self.target_dir, **kwargs)
+
+        self.archive_file, self.archive_hasher, kwargs = self.setup_archive_hasher(self.archive_file, **kwargs)
+
+        # Initialize JsonToDirectoryComparer with None as source_json if hashing is delayed
+        # We don't call JsonToArchiveComparer.__init__ because that's for target archives,
+        # but we inherit from it to satisfy the requested hierarchy and reuse methods.
+
+        # FIXME: this always causes source_json to be None, which is not what we want
+        JsonToDirectoryComparer.__init__(self, source_json=None if self.delay_hashing else self.archive_hash,
+                                         target_dir=self.target_dir, **kwargs)
+
+        self.source_name = kwargs.get("source_name", self.archive_file.name)
+        self.target_name = kwargs.get("target_name", self.target_dir.name)
+
+    @property
+    def archive_hash(self) -> Union[dict, List[dict]]:
+        if self._archive_hash is None:
+            self.logger.info(f"Hashing archive file {self.archive_file.name}")
+            self._archive_hash = self.archive_hasher.hash_archive()
+        # noinspection PyTypeChecker
+        return self._archive_hash
+
+    def compare(self):
+        if self.delay_hashing or self.archive_hash is None or self.jj_hashcomp.source_json is None:
+            self.jj_hashcomp.source_json = self.archive_hash
+            self.delay_hashing = False
+        return super().compare()
 
 
 class _ComparersQT(_QuickTest):
@@ -346,11 +377,12 @@ class _ComparersQT(_QuickTest):
         "jj": JsonToJsonHashComparer,
         "ja": JsonToArchiveComparer,
         "aa": ArchiveToArchiveComparer,
-        "jd": JsonToDirectoryComparer
+        "jd": JsonToDirectoryComparer,
+        "ad": ArchiveToDirectoryComparer
     }
 
 
 if __name__ == '__main__':
-    qt = _ComparersQT(hasher_type_code="jd", use_big=False)
+    qt = _ComparersQT(hasher_type_code="ja", use_big=False)
     qt.get_hc()
     qt.compare_test()

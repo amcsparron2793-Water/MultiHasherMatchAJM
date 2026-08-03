@@ -2,6 +2,7 @@ __pycache__
 /logs/
 /.idea/
 /venv/
-/dist/
+/*dist/
+/.tox*
 /*.egg-info/
 /Misc_Project_Files/manual_testing_files/

@@ -32,6 +32,7 @@ class SetupLogger:
     :ivar basic_config_level: Default log level for basic configuration as a string.
     :type basic_config_level: str
     """
+    DEFAULT_CUSTOM_LOGGER = MultiHasherLogger
 
     def __new__(cls, *args, **kwargs):
         raise TypeError("SetupLogger cannot be instantiated. Use SetupLogger.setup_logger(...) instead.")
@@ -41,7 +42,8 @@ class SetupLogger:
         kwargs.setdefault('log_level_to_stream', 'INFO')
         logger = kwargs.pop('logger', None)
         if not logger:
-            logger = MultiHasherLogger(**kwargs)()
+            if cls.DEFAULT_CUSTOM_LOGGER is not None:
+                logger = cls.DEFAULT_CUSTOM_LOGGER(**kwargs)()
         logger = cls._check_fallback_logger_config(logger=logger, **kwargs)
         return logger
 

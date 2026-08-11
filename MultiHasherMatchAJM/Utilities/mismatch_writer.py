@@ -6,7 +6,7 @@ from typing import Tuple, Union
 
 from CounterAJM import Counter
 
-from MultiHasherMatchAJM import MISC_PROJECT_DIR, MultiHasherSetupLogger
+from MultiHasherMatchAJM import MISC_PROJECT_DIR, SetupLogger
 
 
 class MismatchWriter:
@@ -15,7 +15,7 @@ class MismatchWriter:
     MISMATCH_TIMESTAMP_FORMAT = "%Y%m%d_%H%M"
 
     def __init__(self, **kwargs):
-        self.logger = MultiHasherSetupLogger.setup_logger(**kwargs)
+        self.logger = SetupLogger.setup_logger(**kwargs)
         self.logger.name = self.__class__.__name__
         self._found_mismatch = None
         self._mismatch_entry = None

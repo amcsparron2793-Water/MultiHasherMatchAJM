@@ -5,7 +5,7 @@ from tempfile import gettempdir
 from typing import Union
 from itertools import chain
 
-from MultiHasherMatchAJM import MultiHasherSetupLogger
+from MultiHasherMatchAJM import SetupLogger
 
 
 class ArchiveExtractor:
@@ -19,7 +19,7 @@ class ArchiveExtractor:
         self._extract_dir = None
         self._archive_contents = None
         # noinspection PyTypeChecker
-        self.logger: Logger = MultiHasherSetupLogger.setup_logger(**kwargs)
+        self.logger: Logger = SetupLogger.setup_logger(**kwargs)
 
         self.use_temp_dir = kwargs.get("use_temp_dir", True)
         self.archive_path = archive_path

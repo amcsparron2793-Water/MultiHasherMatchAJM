@@ -1,11 +1,12 @@
 import datetime
 from abc import abstractmethod, ABCMeta
 from json import dump
+from logging import getLogger, Logger
 from os.path import commonpath
 from pathlib import Path
 from typing import Union, Optional, Generator
 
-from MultiHasherMatchAJM import PROJECT_ROOT, MultiHasherSetupLogger, MISC_PROJECT_DIR
+from MultiHasherMatchAJM import PROJECT_ROOT, SetupLogger, MISC_PROJECT_DIR
 
 
 class _Validators:
@@ -85,7 +86,7 @@ class _Recorder(_Validators):
     DEFAULT_RECORD_SAVE_DIR = Path(MISC_PROJECT_DIR)
 
     def __init__(self, **kwargs):
-        self._logger = MultiHasherSetupLogger.setup_logger(**kwargs)
+        self._logger = SetupLogger.setup_logger(**kwargs)
         self._logger.debug(f"Logger name changing from {self._logger.name} to {self.__class__.__name__}")
         self._logger.name = self.__class__.__name__
         self._file_name = None

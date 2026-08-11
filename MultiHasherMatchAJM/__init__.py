@@ -17,5 +17,5 @@ PROJECT_ROOT = find_project_root()
 MISC_PROJECT_DIR = PROJECT_ROOT / "Misc_Project_Files"
 MANUAL_TEST_FILE_LOCATION = Path(MISC_PROJECT_DIR, 'manual_testing_files')
 
-from MultiHasherMatchAJM.Utilities.multihasher_logger import MultiHasherLogger, MultiHasherSetupLogger
+from MultiHasherMatchAJM.Utilities.multihasher_logger import MultiHasherLogger, SetupLogger
 from MultiHasherMatchAJM import Hasher, MatchAndRecord, Utilities

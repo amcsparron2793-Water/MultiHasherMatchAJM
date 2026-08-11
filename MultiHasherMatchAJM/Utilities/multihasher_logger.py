@@ -1,5 +1,5 @@
 from logging import Logger
-from typing import Optional
+from typing import Optional, Any, Union, Callable
 
 from EasyLoggerAJM import EasyLogger, SetupLogger
 from MultiHasherMatchAJM import PROJECT_ROOT
@@ -28,6 +28,11 @@ class MultiHasherSetupLogger(SetupLogger):
     def _check_fallback_logger_config(cls, default_logger_name: Optional[str] = None, **kwargs) -> Logger:
         default_logger_name = default_logger_name or 'logger'
         return super()._check_fallback_logger_config(default_logger_name=default_logger_name, **kwargs)
+
+    # TODO: fix the return type?
+    @classmethod
+    def setup_logger(cls, **kwargs) -> Logger:
+        return super().setup_logger(**kwargs)
 
 
 if __name__ == '__main__':

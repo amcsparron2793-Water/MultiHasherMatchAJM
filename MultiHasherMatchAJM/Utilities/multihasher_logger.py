@@ -29,10 +29,17 @@ class MultiHasherSetupLogger(SetupLogger):
         default_logger_name = default_logger_name or 'logger'
         return super()._check_fallback_logger_config(default_logger_name=default_logger_name, **kwargs)
 
-    # TODO: fix the return type?
+    # TODO: testing
     @classmethod
     def setup_logger(cls, **kwargs) -> Logger:
-        return super().setup_logger(**kwargs)
+        sup = super().setup_logger(**kwargs)
+        if isinstance(sup, Logger):
+            sup.debug("super classmethod setup_logger returned a logger directly")
+            return sup
+        elif hasattr(sup, 'logger'):
+            sup.logger.debug("super classmethod setup_logger returned an object with a logger attribute")
+            return sup.logger
+        raise ValueError("return value of setup_logger must be a Logger instance.")
 
 
 if __name__ == '__main__':

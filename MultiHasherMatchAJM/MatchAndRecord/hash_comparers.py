@@ -1,8 +1,9 @@
 import json
 from abc import abstractmethod, ABCMeta
+from logging import Logger
 from pathlib import Path
 from typing import Union, List, Tuple, Optional
-from MultiHasherMatchAJM import SetupLogger
+from MultiHasherMatchAJM import MultiHasherSetupLogger
 from MultiHasherMatchAJM.Hasher.archive_hashers import ArchiveDirectoryHasher
 from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher
 from MultiHasherMatchAJM.Utilities.mismatch_writer import MismatchWriter
@@ -39,7 +40,7 @@ class _BaseHashComparer(metaclass=ABCMeta):
 
     @classmethod
     def setup_logger(cls, **kwargs):
-        logger = SetupLogger.setup_logger(**kwargs)
+        logger: Logger = MultiHasherSetupLogger.setup_logger(**kwargs)
         logger.name = cls.__name__
         logger.info(f"Initializing {cls.__name__}")
         return logger

@@ -1,7 +1,7 @@
-from logging import Logger, getLogger, basicConfig
+from logging import Logger
 from typing import Optional
 
-from EasyLoggerAJM import EasyLogger
+from EasyLoggerAJM import EasyLogger, SetupLogger
 from MultiHasherMatchAJM import PROJECT_ROOT
 
 
@@ -21,50 +21,17 @@ class MultiHasherLogger(EasyLogger):
         return self.logger
 
 
-class SetupLogger:
-    """
-    Provides methods to configure and manage a logging mechanism. This class
-    ensures that a logger is properly initialized and allows fallback
-    configuration for cases where no logger handlers are defined.
-
-    :ivar log_level_to_stream: Default log level for streaming logs as a string.
-    :type log_level_to_stream: str
-    :ivar basic_config_level: Default log level for basic configuration as a string.
-    :type basic_config_level: str
-    """
+class MultiHasherSetupLogger(SetupLogger):
     DEFAULT_CUSTOM_LOGGER = MultiHasherLogger
-
-    def __new__(cls, *args, **kwargs):
-        raise TypeError("SetupLogger cannot be instantiated. Use SetupLogger.setup_logger(...) instead.")
-
-    @classmethod
-    def setup_logger(cls, **kwargs) -> Logger:
-        kwargs.setdefault('log_level_to_stream', 'INFO')
-        logger = kwargs.pop('logger', None)
-        if not logger:
-            if cls.DEFAULT_CUSTOM_LOGGER is not None:
-                logger = cls.DEFAULT_CUSTOM_LOGGER(**kwargs)()
-        logger = cls._check_fallback_logger_config(logger=logger, **kwargs)
-        return logger
 
     @classmethod
     def _check_fallback_logger_config(cls, default_logger_name: Optional[str] = None, **kwargs) -> Logger:
-        default_logger_name = default_logger_name or cls.__name__
-        logger = kwargs.get('logger', None)
-        basic_config_level = kwargs.pop('basic_config_level', 'DEBUG')
-
-        if not logger:
-            logger = getLogger(default_logger_name)
-        if logger.name == default_logger_name or not logger.hasHandlers():
-            basicConfig(level=basic_config_level)
-            logger.info(f'using basic config with level: {basic_config_level}')
-        else:
-            logger.info(f"logger: {logger.name} already has handlers, not using basicConfig")
-        logger.info(f"Using logger: {logger.name}")
-        return logger
+        default_logger_name = default_logger_name or 'logger'
+        return super()._check_fallback_logger_config(default_logger_name=default_logger_name, **kwargs)
 
 
 if __name__ == '__main__':
-    abl = MultiHasherLogger()()
+    #abl = MultiHasherLogger()()
+    abl = MultiHasherSetupLogger.setup_logger()
     abl.info("this is an info message")
     abl.warning("this is a warning message")

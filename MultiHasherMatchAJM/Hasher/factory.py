@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 from pathlib import Path
 from typing import Union, Optional
 
-from MultiHasherMatchAJM import SetupLogger
+from MultiHasherMatchAJM import MultiHasherSetupLogger
 from MultiHasherMatchAJM.Hasher import _BaseHasher
 from MultiHasherMatchAJM.Hasher.archive_hashers import ArchiveDirectoryHasher
 from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher
@@ -68,7 +68,7 @@ class HasherFactory(_BaseFactoryHasher):
 
     def __new__(cls, *args, **kwargs):
         input_path: Optional[Union[str, Path]] = kwargs.pop("input_path", None)
-        kwargs["logger"] = SetupLogger.setup_logger(**kwargs)
+        kwargs["logger"] = MultiHasherSetupLogger.setup_logger(**kwargs)
         return cls.validate_and_process_input_path(input_path, **kwargs)
 
 

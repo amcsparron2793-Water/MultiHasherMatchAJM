@@ -1,19 +1,19 @@
 # noinspection PyPackageRequirements
 import pytest
 
-from MultiHasherMatchAJM import SetupLogger
+from MultiHasherMatchAJM import MultiHasherSetupLogger
 
 
 @pytest.fixture(autouse=True)
 def disable_logger_console_output(monkeypatch):
-    original_setup_logger = SetupLogger.setup_logger
+    original_setup_logger = MultiHasherSetupLogger.setup_logger
 
     def setup_logger_without_console(**kwargs):
         kwargs.setdefault("show_warning_logs_in_console", False)
         return original_setup_logger(**kwargs)
 
     monkeypatch.setattr(
-        SetupLogger,
+        MultiHasherSetupLogger,
         "setup_logger",
         setup_logger_without_console,
     )

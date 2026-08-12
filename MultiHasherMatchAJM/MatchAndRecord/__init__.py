@@ -1,0 +1,1 @@
+from MultiHasherMatchAJM.MatchAndRecord.factory import ComparerFactory

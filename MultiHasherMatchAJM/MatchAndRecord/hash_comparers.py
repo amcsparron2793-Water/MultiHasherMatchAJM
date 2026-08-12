@@ -4,8 +4,9 @@ from logging import Logger
 from pathlib import Path
 from typing import Union, List, Tuple, Optional
 from MultiHasherMatchAJM import MultiHasherSetupLogger
-from MultiHasherMatchAJM.Hasher.archive_hashers import ArchiveDirectoryHasher
-from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher
+# these are imported on the fly to avoid circular imports
+# from MultiHasherMatchAJM.Hasher.archive_hashers import ArchiveDirectoryHasher
+# from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher
 from MultiHasherMatchAJM.Utilities.mismatch_writer import MismatchWriter
 
 # noinspection PyProtectedMember
@@ -125,7 +126,9 @@ class _BaseHashComparer(metaclass=ABCMeta):
 
 
 class _ArchiveHandlerMixin:
-    def setup_archive_hasher(self, archive_file: Path, **kwargs) -> Tuple[Path, ArchiveDirectoryHasher, dict]:
+    def setup_archive_hasher(self, archive_file: Path, **kwargs) -> Tuple[Path, dict]:
+        from MultiHasherMatchAJM.Hasher.archive_hashers import ArchiveDirectoryHasher
+
         kwargs.setdefault('unzip_and_hash_contents', True)
         kwargs.setdefault('preserve_archive', False)
         archive_hasher = ArchiveDirectoryHasher(input_path=archive_file, **kwargs)
@@ -314,7 +317,7 @@ class JsonToDirectoryComparer(_BaseHashComparer):
                                                   target_json=None if self.delay_hashing else self.directory_hash,
                                                   **kwargs)
 
-        if self.source_json is not None:
+        if isinstance(self.source_json, Path):
             self.source_name = self.source_json.name
         self.target_name = self.target_dir.name
 

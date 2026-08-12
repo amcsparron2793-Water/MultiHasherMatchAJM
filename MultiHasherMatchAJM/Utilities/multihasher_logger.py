@@ -8,15 +8,21 @@ from MultiHasherMatchAJM import PROJECT_ROOT
 class MultiHasherLogger(EasyLogger):
     _PROJECT_ROOT = PROJECT_ROOT
     ROOT_LOG_LOCATION_DEFAULT = _PROJECT_ROOT / 'logs'
+    # noinspection SpellCheckingInspection
     PROJECT_NAME = 'MultiHasherMatchAJM'
     DEFAULT_LOG_SPEC = 'hourly'
     DEFAULT_SHOW_WARNING_LOGS_IN_CONSOLE = True
 
-    def __init__(self, **kwargs):
-        kwargs.setdefault('project_name', self.__class__.PROJECT_NAME)
+    @classmethod
+    def _set_project_specific_kwarg_defaults(cls, **kwargs):
+        kwargs.setdefault('project_name', cls.PROJECT_NAME)
         kwargs.setdefault('show_warning_logs_in_console',
-                          self.__class__.DEFAULT_SHOW_WARNING_LOGS_IN_CONSOLE)
-        kwargs.setdefault('log_spec', self.__class__.DEFAULT_LOG_SPEC)
+                          cls.DEFAULT_SHOW_WARNING_LOGS_IN_CONSOLE)
+        kwargs.setdefault('log_spec', cls.DEFAULT_LOG_SPEC)
+        return kwargs
+
+    def __init__(self, **kwargs):
+        kwargs = self._set_project_specific_kwarg_defaults(**kwargs)
         super().__init__(**kwargs)
         self.logger.name = self.__class__.__name__
 
@@ -42,7 +48,7 @@ class MultiHasherSetupLogger(SetupLogger):
 
     @classmethod
     def setup_logger(cls, **kwargs) -> Logger:
-        rwi = False if 'return_wrapper_instance' in kwargs else True
+        rwi = True if 'return_wrapper_instance' in kwargs else False
         sup = super().setup_logger(**kwargs)
 
         if isinstance(sup, Logger):

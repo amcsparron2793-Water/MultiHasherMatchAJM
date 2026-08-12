@@ -126,7 +126,7 @@ class _BaseHashComparer(metaclass=ABCMeta):
 
 
 class _ArchiveHandlerMixin:
-    def setup_archive_hasher(self, archive_file: Path, **kwargs) -> Tuple[Path, dict]:
+    def setup_archive_hasher(self, archive_file: Path, **kwargs) -> Tuple[Path, type, dict]:
         from MultiHasherMatchAJM.Hasher.archive_hashers import ArchiveDirectoryHasher
 
         kwargs.setdefault('unzip_and_hash_contents', True)
@@ -388,6 +388,6 @@ class _ComparersQT(_QuickTest):
 
 
 if __name__ == '__main__':
-    qt = _ComparersQT(hasher_type_code="ja", use_big=False)
+    qt = _ComparersQT(hasher_type_code="ad", use_big=False)
     qt.get_hc()
     qt.compare_test()

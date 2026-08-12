@@ -9,11 +9,14 @@ class MultiHasherLogger(EasyLogger):
     _PROJECT_ROOT = PROJECT_ROOT
     ROOT_LOG_LOCATION_DEFAULT = _PROJECT_ROOT / 'logs'
     PROJECT_NAME = 'MultiHasherMatchAJM'
+    DEFAULT_LOG_SPEC = 'hourly'
+    DEFAULT_SHOW_WARNING_LOGS_IN_CONSOLE = True
 
     def __init__(self, **kwargs):
         kwargs.setdefault('project_name', self.__class__.PROJECT_NAME)
-        kwargs.setdefault('show_warning_logs_in_console', True)
-        kwargs.setdefault('log_spec', 'hourly')
+        kwargs.setdefault('show_warning_logs_in_console',
+                          self.__class__.DEFAULT_SHOW_WARNING_LOGS_IN_CONSOLE)
+        kwargs.setdefault('log_spec', self.__class__.DEFAULT_LOG_SPEC)
         super().__init__(**kwargs)
         self.logger.name = self.__class__.__name__
 
@@ -23,21 +26,32 @@ class MultiHasherLogger(EasyLogger):
 
 class MultiHasherSetupLogger(SetupLogger):
     DEFAULT_CUSTOM_LOGGER = MultiHasherLogger
+    RWI_WARNING_TEXT = ("return_wrapper_instance was set to True. "
+                        "MultiHasherSetupLogger ignores this kwarg "
+                        "and will always return a logger instance.")
 
     @classmethod
     def _check_fallback_logger_config(cls, default_logger_name: Optional[str] = None, **kwargs) -> Logger:
         default_logger_name = default_logger_name or 'logger'
         return super()._check_fallback_logger_config(default_logger_name=default_logger_name, **kwargs)
 
-    # TODO: testing
+    @classmethod
+    def _rwi_warning(cls, logger, rwi):
+        if rwi:
+            logger.warning(cls.RWI_WARNING_TEXT)
+
     @classmethod
     def setup_logger(cls, **kwargs) -> Logger:
+        rwi = False if 'return_wrapper_instance' in kwargs else True
         sup = super().setup_logger(**kwargs)
+
         if isinstance(sup, Logger):
             sup.debug("super classmethod setup_logger returned a logger directly")
+            cls._rwi_warning(sup, rwi)
             return sup
         elif hasattr(sup, 'logger'):
             sup.logger.debug("super classmethod setup_logger returned an object with a logger attribute")
+            cls._rwi_warning(sup.logger, rwi)
             return sup.logger
         raise ValueError("return value of setup_logger must be a Logger instance.")
 

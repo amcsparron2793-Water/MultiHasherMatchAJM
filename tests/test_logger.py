@@ -67,3 +67,7 @@ class TestSetupLogger:
                 found = True
                 break
         assert found, f"Expected 'using basic config' in logs, got {mock_info.call_args_list}"
+
+    def test_setup_logger_returns_logger(self):
+        logger = MultiHasherSetupLogger.setup_logger(return_wrapper_instance=True)
+        assert isinstance(logger, logging.Logger)

@@ -1,10 +1,12 @@
 import json
 from abc import abstractmethod, ABCMeta
+from logging import Logger
 from pathlib import Path
 from typing import Union, List, Tuple, Optional
-from MultiHasherMatchAJM import SetupLogger
-from MultiHasherMatchAJM.Hasher.archive_hashers import ArchiveDirectoryHasher
-from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher
+from MultiHasherMatchAJM import MultiHasherSetupLogger
+# these are imported on the fly to avoid circular imports
+# from MultiHasherMatchAJM.Hasher.archive_hashers import ArchiveDirectoryHasher
+# from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher
 from MultiHasherMatchAJM.Utilities.mismatch_writer import MismatchWriter
 
 # noinspection PyProtectedMember
@@ -39,7 +41,7 @@ class _BaseHashComparer(metaclass=ABCMeta):
 
     @classmethod
     def setup_logger(cls, **kwargs):
-        logger = SetupLogger.setup_logger(**kwargs)
+        logger: Logger = MultiHasherSetupLogger.setup_logger(**kwargs)
         logger.name = cls.__name__
         logger.info(f"Initializing {cls.__name__}")
         return logger
@@ -124,7 +126,9 @@ class _BaseHashComparer(metaclass=ABCMeta):
 
 
 class _ArchiveHandlerMixin:
-    def setup_archive_hasher(self, archive_file: Path, **kwargs) -> Tuple[Path, ArchiveDirectoryHasher, dict]:
+    def setup_archive_hasher(self, archive_file: Path, **kwargs) -> Tuple[Path, dict]:
+        from MultiHasherMatchAJM.Hasher.archive_hashers import ArchiveDirectoryHasher
+
         kwargs.setdefault('unzip_and_hash_contents', True)
         kwargs.setdefault('preserve_archive', False)
         archive_hasher = ArchiveDirectoryHasher(input_path=archive_file, **kwargs)
@@ -301,6 +305,7 @@ class JsonToDirectoryComparer(_BaseHashComparer):
         # to use explicit base class initialization (`_BaseHashComparer.__init__`)
         # instead of `super().__init__` where needed to avoid `TypeError`
         # from `JsonToArchiveComparer`'s positional arguments.
+        from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher
         _BaseHashComparer.__init__(self, **kwargs)
         kwargs.setdefault('logger', self.logger)
         self._directory_hash = None
@@ -313,7 +318,7 @@ class JsonToDirectoryComparer(_BaseHashComparer):
                                                   target_json=None if self.delay_hashing else self.directory_hash,
                                                   **kwargs)
 
-        if self.source_json is not None:
+        if isinstance(self.source_json, Path):
             self.source_name = self.source_json.name
         self.target_name = self.target_dir.name
 

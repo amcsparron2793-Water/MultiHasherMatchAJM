@@ -2,7 +2,7 @@ from logging import Logger
 from pathlib import Path
 from typing import Union
 
-from MultiHasherMatchAJM import SetupLogger
+from MultiHasherMatchAJM import MultiHasherSetupLogger
 
 
 class _BaseHasher:
@@ -10,7 +10,7 @@ class _BaseHasher:
 
     def __init__(self, input_path, **kwargs):
         self._input_path = None
-        self._logger: Logger = SetupLogger.setup_logger(**kwargs)
+        self._logger: Logger = MultiHasherSetupLogger.setup_logger(**kwargs)
         self._logger.info(f"Initializing {self.__class__.__name__}")
 
         self.buffer_size = kwargs.get("buffer_size", self.__class__.DEFAULT_BUFFER_SIZE)

@@ -305,6 +305,7 @@ class JsonToDirectoryComparer(_BaseHashComparer):
         # to use explicit base class initialization (`_BaseHashComparer.__init__`)
         # instead of `super().__init__` where needed to avoid `TypeError`
         # from `JsonToArchiveComparer`'s positional arguments.
+        from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher
         _BaseHashComparer.__init__(self, **kwargs)
         kwargs.setdefault('logger', self.logger)
         self._directory_hash = None

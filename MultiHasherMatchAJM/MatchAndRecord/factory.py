@@ -2,7 +2,7 @@ from os import PathLike
 from pathlib import Path
 from typing import Any, Optional
 
-from MultiHasherMatchAJM import SetupLogger
+from MultiHasherMatchAJM import MultiHasherSetupLogger
 from MultiHasherMatchAJM.MatchAndRecord import hash_comparers
 
 
@@ -144,7 +144,7 @@ class ComparerFactory(_InputHelpers):
         )
 
     def __new__(cls, source: Any, target: Any, **kwargs):
-        kwargs["logger"] = SetupLogger.setup_logger(**kwargs)
+        kwargs["logger"] = MultiHasherSetupLogger.setup_logger(**kwargs)
         return cls.inst_comparer_class(source, target, **kwargs)
 
 

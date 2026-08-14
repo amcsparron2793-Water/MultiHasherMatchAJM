@@ -1,5 +1,4 @@
 from logging import Logger
-from typing import Optional, Any, Union, Callable
 
 from EasyLoggerAJM import EasyLogger, SetupLogger
 from MultiHasherMatchAJM import PROJECT_ROOT
@@ -35,11 +34,6 @@ class MultiHasherSetupLogger(SetupLogger):
     RWI_WARNING_TEXT = ("return_wrapper_instance was set to True. "
                         "MultiHasherSetupLogger ignores this kwarg "
                         "and will always return a logger instance.")
-
-    @classmethod
-    def _check_fallback_logger_config(cls, default_logger_name: Optional[str] = None, **kwargs) -> Logger:
-        default_logger_name = default_logger_name or 'logger'
-        return super()._check_fallback_logger_config(default_logger_name=default_logger_name, **kwargs)
 
     @classmethod
     def _rwi_warning(cls, logger, rwi):

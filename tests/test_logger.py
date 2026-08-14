@@ -44,20 +44,20 @@ class TestSetupLogger:
 
     def test_check_fallback_logger_config_no_handlers(self):
         # Create a logger with no handlers
-        no_handler_logger = logging.getLogger("NoHandlersUnique5")
+        # Using a truly unique name to avoid interference
+        import uuid
+        unique_name = f"NoHandlers_{uuid.uuid4().hex}"
+        no_handler_logger = logging.getLogger(unique_name)
         no_handler_logger.handlers = []
         no_handler_logger.propagate = False
-        
-        # We need to mock hasHandlers to return False because pytest adds handlers
+
         import unittest.mock as mock
-        # We MUST mock MultiHasherMatchAJM.multihasher_logger.basicConfig because it was imported with 'from'
-        # FIXME: the mock patch isnt correct since multihasher_logger doesnt have basicConfig
-        pytest.skip("Mocking basicConfig is not working")
-        with mock.patch("MultiHasherMatchAJM.Utilities.multihasher_logger.basicConfig") as mock_basic_config:
-            with mock.patch.object(no_handler_logger, 'hasHandlers', return_value=False):
-                with mock.patch.object(no_handler_logger, 'info') as mock_info:
-                    logger = MultiHasherSetupLogger._check_fallback_logger_config(logger=no_handler_logger)
-        
+        # We need to mock logging.basicConfig as it's called by the fallback logic
+        with mock.patch("logging.basicConfig") as mock_basic_config:
+            # We also mock info to verify the fallback message is logged
+            with mock.patch.object(no_handler_logger, 'info') as mock_info:
+                logger = MultiHasherSetupLogger._check_fallback_logger_config(logger=no_handler_logger)
+
         assert logger == no_handler_logger
         mock_basic_config.assert_called_once()
         # Check if any call to info contains "using basic config"

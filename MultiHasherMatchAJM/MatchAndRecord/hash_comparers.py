@@ -2,7 +2,7 @@ import json
 from abc import abstractmethod, ABCMeta
 from logging import Logger
 from pathlib import Path
-from typing import Union, List, Tuple, Optional, TYPE_CHECKING
+from typing import Union, List, Tuple, Optional, TYPE_CHECKING, Type
 from MultiHasherMatchAJM import MultiHasherSetupLogger, MANUAL_TEST_FILE_LOCATION
 from MultiHasherMatchAJM.Utilities.mismatch_writer import MismatchWriter
 
@@ -125,12 +125,13 @@ class _BaseHashComparer(metaclass=ABCMeta):
 
 
 class _ArchiveHandlerMixin:
-    def setup_archive_hasher(self, archive_file: Path, **kwargs) -> Tuple[Path, type, dict]:
+    def setup_archive_hasher(self, archive_file: Path, **kwargs) -> Tuple[Path, 'ArchiveDirectoryHasher', dict]:
         from MultiHasherMatchAJM.Hasher.archive_hashers import ArchiveDirectoryHasher
 
         kwargs.setdefault('unzip_and_hash_contents', True)
         kwargs.setdefault('preserve_archive', False)
         archive_hasher = ArchiveDirectoryHasher(input_path=archive_file, **kwargs)
+        # noinspection PyUnresolvedReferences
         self.logger.info(f"Archive hasher initialized for {archive_file.name}")
         return archive_file, archive_hasher, kwargs
 
@@ -354,7 +355,6 @@ class ArchiveToDirectoryComparer(JsonToDirectoryComparer, JsonToArchiveComparer,
         self.target_dir = target_dir
 
         self.archive_file, self.archive_hasher, kwargs = self.setup_archive_hasher(self.archive_file, **kwargs)
-        self.archive_hasher: ArchiveDirectoryHasher = self.archive_hasher
         # Initialize JsonToDirectoryComparer with None as source_json if hashing is delayed
         # We don't call JsonToArchiveComparer.__init__ because that's for target archives,
         # but we inherit from it to satisfy the requested hierarchy and reuse methods.

@@ -14,7 +14,7 @@ class MultiHasherLogger(EasyLogger):
     DEFAULT_SHOW_WARNING_LOGS_IN_CONSOLE = True
 
     @classmethod
-    def _set_project_specific_kwarg_defaults(cls, **kwargs):
+    def _set_project_specific_kwarg_defaults(cls, **kwargs) -> dict[str, Any]:
         kwargs.setdefault('project_name', cls.PROJECT_NAME)
         kwargs.setdefault('show_warning_logs_in_console',
                           cls.DEFAULT_SHOW_WARNING_LOGS_IN_CONSOLE)

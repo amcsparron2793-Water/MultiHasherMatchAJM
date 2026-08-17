@@ -82,6 +82,7 @@ class ComparerFactory(_InputHelpers):
     _JSON_SOURCE_ARCHIVE_TARGET_CLS = hash_comparers.JsonToArchiveComparer
     _JSON_SOURCE_DIRECTORY_TARGET_CLS = hash_comparers.JsonToDirectoryComparer
     _ARCHIVE_SOURCE_ARCHIVE_TARGET_CLS = hash_comparers.ArchiveToArchiveComparer
+    _ARCHIVE_SOURCE_DIRECTORY_TARGET_CLS = hash_comparers.ArchiveToDirectoryComparer
 
     @classmethod
     def _json_src_targets(cls, source: Any, target: Any, **kwargs):
@@ -115,10 +116,18 @@ class ComparerFactory(_InputHelpers):
     @classmethod
     def _archive_src_targets(cls, source: Any, target: Any, **kwargs):
         target_is_archive = cls._is_archive_input(target)
+        target_is_directory = cls._is_directory_input(target)\
+
         if target_is_archive:
             return hash_comparers.ArchiveToArchiveComparer(
                 source_archive_file=Path(source),
                 target_archive_file=Path(target),
+                **kwargs,
+            )
+        if target_is_directory:
+            return cls._ARCHIVE_SOURCE_DIRECTORY_TARGET_CLS(
+                archive_file=Path(source),
+                target_dir=Path(target),
                 **kwargs,
             )
         return None

@@ -79,12 +79,14 @@ class _BaseHashComparer(metaclass=ABCMeta):
             self.logger.debug(f"delay_hashing is set to {self._delay_hashing}")
 
     def _set_name_for_jj(self, value, name_attr_to_set):
+        set_attr_log_msg = f"Setting {name_attr_to_set} to {value} for {self.__class__.__name__}"
+
         if hasattr(self, 'jj_hashcomp'):
-            self.logger.debug(f"Setting {name_attr_to_set} to {value} for {self.__class__.__name__}")
+            self.logger.debug(set_attr_log_msg)
             setattr(self.jj_hashcomp, name_attr_to_set, value)
             return
         elif isinstance(self, JsonToJsonHashComparer):
-            self.logger.debug(f"setting {name_attr_to_set} to {value} for {self.__class__.__name__}")
+            self.logger.debug(set_attr_log_msg)
             self.__setattr__(f"_{name_attr_to_set}", value)
             return
         self.logger.debug(f"No jj_hashcomp attribute found for {self.__class__.__name__}")

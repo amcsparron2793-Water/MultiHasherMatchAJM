@@ -2,15 +2,14 @@ import json
 from abc import abstractmethod, ABCMeta
 from logging import Logger
 from pathlib import Path
-from typing import Union, List, Tuple, Optional
-from MultiHasherMatchAJM import MultiHasherSetupLogger
-# these are imported on the fly to avoid circular imports
-# from MultiHasherMatchAJM.Hasher.archive_hashers import ArchiveDirectoryHasher
-# from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher
+from typing import Union, List, Tuple, Optional, TYPE_CHECKING, Type
+from MultiHasherMatchAJM import MultiHasherSetupLogger, MANUAL_TEST_FILE_LOCATION
 from MultiHasherMatchAJM.Utilities.mismatch_writer import MismatchWriter
 
 # noinspection PyProtectedMember
 from MultiHasherMatchAJM.Hasher._utilities import _QuickTest
+if TYPE_CHECKING:
+    from MultiHasherMatchAJM.Hasher.archive_hashers import ArchiveDirectoryHasher
 
 
 class _BaseHashComparer(metaclass=ABCMeta):
@@ -128,12 +127,13 @@ class _BaseHashComparer(metaclass=ABCMeta):
 
 
 class _ArchiveHandlerMixin:
-    def setup_archive_hasher(self, archive_file: Path, **kwargs) -> Tuple[Path, dict]:
+    def setup_archive_hasher(self, archive_file: Path, **kwargs) -> Tuple[Path, 'ArchiveDirectoryHasher', dict]:
         from MultiHasherMatchAJM.Hasher.archive_hashers import ArchiveDirectoryHasher
 
         kwargs.setdefault('unzip_and_hash_contents', True)
         kwargs.setdefault('preserve_archive', False)
         archive_hasher = ArchiveDirectoryHasher(input_path=archive_file, **kwargs)
+        # noinspection PyUnresolvedReferences
         self.logger.info(f"Archive hasher initialized for {archive_file.name}")
         return archive_file, archive_hasher, kwargs
 
@@ -210,9 +210,14 @@ class JsonToJsonHashComparer(_BaseHashComparer):
             self.source_name = value.name
         self._source_json = self._get_json(value)
 
+    def _get_json_population_warning(self):
+        self.logger.warning(f"source_json is {'POPULATED' if self.source_json else 'NOT POPULATED'}, "
+                            f"target_json is {'POPULATED' if self.target_json else 'NOT POPULATED'}, "
+                            f"cannot compare.")
+
     def _all_source_in_target(self):
         if self.source_json is None or self.target_json is None:
-            self.logger.warning("source_json or target_json is None, cannot compare.")
+            self._get_json_population_warning()
             return False
         return self._all_x_keys_in_y_keys(x=self.source_json,
                                           y=self.target_json,
@@ -220,7 +225,7 @@ class JsonToJsonHashComparer(_BaseHashComparer):
 
     def _all_target_in_source(self):
         if self.source_json is None or self.target_json is None:
-            self.logger.warning("source_json or target_json is None, cannot compare.")
+            self._get_json_population_warning()
             return False
         return self._all_x_keys_in_y_keys(x=self.target_json,
                                           y=self.source_json,
@@ -340,16 +345,59 @@ class JsonToDirectoryComparer(_BaseHashComparer):
         return self.jj_hashcomp.compare()
 
 
+class ArchiveToDirectoryComparer(JsonToDirectoryComparer, JsonToArchiveComparer, _ArchiveHandlerMixin, _BaseHashComparer):
+    def __init__(self, archive_file: Path, target_dir: Path, **kwargs):
+        self._archive_hash = None
+        self._delay_hashing = None
+
+        _BaseHashComparer.__init__(self, **kwargs)
+        kwargs.setdefault('logger', self.logger)
+
+        self.archive_file = archive_file
+        self.target_dir = target_dir
+
+        self.archive_file, self.archive_hasher, kwargs = self.setup_archive_hasher(self.archive_file, **kwargs)
+        # Initialize JsonToDirectoryComparer with None as source_json if hashing is delayed
+        # We don't call JsonToArchiveComparer.__init__ because that's for target archives,
+        # but we inherit from it to satisfy the requested hierarchy and reuse methods.
+        # noinspection PyTypeChecker
+        JsonToDirectoryComparer.__init__(self, source_json=(None if self.delay_hashing
+                                                            else self.archive_hash),
+                                         target_dir=self.target_dir, **kwargs)
+
+        self.source_name = kwargs.get("source_name", self.archive_file.name)
+        self.target_name = kwargs.get("target_name", self.target_dir.name)
+
+    @property
+    def archive_hash(self) -> Union[dict, List[dict]]:
+        if self._archive_hash is None:
+            self.logger.info(f"Hashing archive file {self.archive_file.name}")
+            self._archive_hash = self.archive_hasher.hash_archive()
+        # noinspection PyTypeChecker
+        return self._archive_hash
+
+    def compare(self):
+        if self.delay_hashing or self.archive_hash is None or self.jj_hashcomp.source_json is None:
+            self.jj_hashcomp.source_json = self.archive_hash
+            self.jj_hashcomp.target_json = self.directory_hash
+            self.delay_hashing = False
+        return super().compare()
+
+
 class _ComparersQT(_QuickTest):
+    # this TEST_TARGET_DIR works to check that ArchiveToDirectoryComparer can identify
+    # an identical archive and directory
+    # TEST_TARGET_DIR = Path( MANUAL_TEST_FILE_LOCATION, "HostedFeatureStorage_Other")
     HASHER_CLASS_MAP = {
         "jj": JsonToJsonHashComparer,
         "ja": JsonToArchiveComparer,
         "aa": ArchiveToArchiveComparer,
-        "jd": JsonToDirectoryComparer
+        "jd": JsonToDirectoryComparer,
+        "ad": ArchiveToDirectoryComparer
     }
 
 
 if __name__ == '__main__':
-    qt = _ComparersQT(hasher_type_code="jd", use_big=False)
+    qt = _ComparersQT(hasher_type_code="ad", use_big=False)
     qt.get_hc()
     qt.compare_test()

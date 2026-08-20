@@ -11,6 +11,7 @@ class _ValidHasherCodes(Enum):
     AA = "aa"
     JD = "jd"
     AD = "ad"
+    DD = "dd"
 
 
 class _QuickTest:
@@ -22,6 +23,9 @@ class _QuickTest:
     TEST_BIG_DIR_JSON = Path(MANUAL_TEST_FILE_LOCATION, "Desktop_Backup.json")
     TEST_TARGET_DIR = Path("~/Desktop/ArcMap and Pro Projects").expanduser()
     TEST_BIG_TARGET_DIR = Path("~/Desktop").expanduser()
+    # these are used for testing DirectoryToDirectoryComparer
+    TEST_SOURCE_DIR = Path(MANUAL_TEST_FILE_LOCATION / 'HostedFeatureStorage')
+    TEST_TARGET_DIR = Path(MANUAL_TEST_FILE_LOCATION / 'HostedFeatureStorage_Other')
 
     HASHER_CLASS_MAP = {}
     VALID_HASHER_CODES = _ValidHasherCodes
@@ -33,6 +37,7 @@ class _QuickTest:
         self._aa = False
         self._jd = False
         self._ad = False
+        self._dd = False
 
         self._class_to_use = None
         self.hc = None
@@ -116,6 +121,12 @@ class _QuickTest:
             self.hc = self.class_to_use(archive_file=self.__class__.TEST_NEW_ZIP,
                                         target_dir=target_dir,
                                         **kwargs)
+
+        elif self._dd:
+            self.hc = self.class_to_use(source_dir=self.__class__.TEST_SOURCE_DIR,
+                                        target_dir=self.__class__.TEST_TARGET_DIR,
+                                        **kwargs)
+
 
     def compare_test(self):
         if self.hc:

@@ -2,8 +2,8 @@ import json
 from abc import abstractmethod, ABCMeta
 from logging import Logger
 from pathlib import Path
-from typing import Union, List, Tuple, Optional, TYPE_CHECKING, Type
-from MultiHasherMatchAJM import MultiHasherSetupLogger, MANUAL_TEST_FILE_LOCATION
+from typing import Union, List, Tuple, Optional, TYPE_CHECKING
+from MultiHasherMatchAJM import MultiHasherSetupLogger
 from MultiHasherMatchAJM.Utilities.mismatch_writer import MismatchWriter
 
 # noinspection PyProtectedMember
@@ -423,11 +423,12 @@ class _ComparersQT(_QuickTest):
         "ja": JsonToArchiveComparer,
         "aa": ArchiveToArchiveComparer,
         "jd": JsonToDirectoryComparer,
-        "ad": ArchiveToDirectoryComparer
+        "ad": ArchiveToDirectoryComparer,
+        "dd": DirectoryToDirectoryComparer
     }
 
 
 if __name__ == '__main__':
-    qt = _ComparersQT(hasher_type_code="ad", use_big=False)
+    qt = _ComparersQT(hasher_type_code="dd", use_big=False)
     qt.get_hc()
     qt.compare_test()

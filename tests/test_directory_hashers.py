@@ -2,6 +2,7 @@ import pytest
 from pathlib import Path
 from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher, LargeDirectoryHasher
 
+
 class TestDirectoryHasher:
     @pytest.fixture
     def test_dir(self, tmp_path):
@@ -22,7 +23,7 @@ class TestDirectoryHasher:
     def test_validate_input_path(self, tmp_path):
         f = tmp_path / "file.txt"
         f.touch()
-        dh = DirectoryHasher(tmp_path) # input_path must exist
+        dh = DirectoryHasher(tmp_path)  # input_path must exist
         dh.input_path = f
         with pytest.raises(ValueError):
             dh._validate_input_path_is_dir()
@@ -44,14 +45,14 @@ class TestDirectoryHasher:
         for path, h in hashes:
             assert isinstance(path, Path)
             assert isinstance(h, str)
-            assert len(h) == 32 # md5 hexdigest
+            assert len(h) == 32  # md5 hexdigest
 
     def test_hash_and_record_directory(self, test_dir, tmp_path):
         save_dir = tmp_path / "records"
         file_name = "custom_record.json"
         dh = DirectoryHasher(test_dir, record_save_dir=save_dir, file_name=file_name)
         records = dh.hash_and_record_directory(relative_to=test_dir, filename=file_name)
-        
+
         assert len(records) == 3
         assert (save_dir / file_name).exists()
 
@@ -60,16 +61,17 @@ class TestDirectoryHasher:
         system_dir = test_dir / ".hidden"
         system_dir.mkdir()
         (system_dir / "trash.txt").write_text("trash")
-        
+
         dh = DirectoryHasher(test_dir, ignore_system_dirs=True)
         files = list(dh._walk_directory(test_dir))
         filenames = [f.name for f in files]
         assert "trash.txt" not in filenames
-        
+
         dh_no_ignore = DirectoryHasher(test_dir, ignore_system_dirs=False)
         files_all = list(dh_no_ignore._walk_directory(test_dir))
         filenames_all = [f.name for f in files_all]
         assert "trash.txt" in filenames_all
+
 
 class TestLargeDirectoryHasher:
     @pytest.fixture
@@ -86,4 +88,4 @@ class TestLargeDirectoryHasher:
         assert ldh.input_path == test_dir_large
         # Since test_dir size is small, it should have logged a warning, 
         # but we just check if it initialized correctly.
-        assert ldh.buffer_size == 1024**3 # 1GB
+        assert ldh.buffer_size == 1024 ** 3  # 1GB

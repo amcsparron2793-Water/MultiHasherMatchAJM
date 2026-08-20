@@ -384,6 +384,36 @@ class ArchiveToDirectoryComparer(JsonToDirectoryComparer, JsonToArchiveComparer,
         return super().compare()
 
 
+class DirectoryToDirectoryComparer(JsonToDirectoryComparer, _BaseHashComparer):
+    def __init__(self, source_dir: Path, target_dir: Path, **kwargs):
+        from MultiHasherMatchAJM.Hasher.directory_hashers import DirectoryHasher
+        _BaseHashComparer.__init__(self, **kwargs)
+        kwargs.setdefault('logger', self.logger)
+
+        self._source_directory_hash = None
+        self.source_dir = source_dir
+
+        self.source_directory_hasher = DirectoryHasher(input_path=self.source_dir, **kwargs)
+        self.target_dir = target_dir
+
+        # noinspection PyTypeChecker
+        JsonToDirectoryComparer.__init__(self, source_json=None if self.delay_hashing else self.source_directory_hash,
+                                         target_dir=self.target_dir, **kwargs)
+
+    @property
+    def source_directory_hash(self) -> dict:
+        if self._source_directory_hash is None:
+            self._source_directory_hash = self.source_directory_hasher.hash_and_record_directory()
+        return self._source_directory_hash
+
+    def compare(self):
+        if self.delay_hashing or self.source_directory_hash is None:
+            self.jj_hashcomp.source_json = self.source_directory_hash
+            self.jj_hashcomp.target_json = self.directory_hash
+            self.delay_hashing = False
+        return super().compare()
+
+
 class _ComparersQT(_QuickTest):
     # this TEST_TARGET_DIR works to check that ArchiveToDirectoryComparer can identify
     # an identical archive and directory

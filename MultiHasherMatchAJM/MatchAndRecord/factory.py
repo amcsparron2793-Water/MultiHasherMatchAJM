@@ -15,10 +15,51 @@ class _PathHelpers:
 
     @staticmethod
     def _path_exists_as(path: Path, predicate_name: str) -> bool:
+        """
+        Checks if a given path satisfies a predicate specified by its name.
+
+        This static method attempts to call a predicate method (e.g., "exists", "is_file",
+        "is_dir") on the given Path object. If the predicate execution results in an OSError,
+        the method returns False.
+
+        :param path: The Path object representing a filesystem path.
+        :type path: Path
+        :param predicate_name: The name of the predicate method on the Path object.
+        :type predicate_name: str
+        :return: A boolean value indicating whether the path satisfies the specified predicate.
+        :rtype: bool
+        """
         try:
             return getattr(path, predicate_name)()
         except OSError:
             return False
+
+    @staticmethod
+    def _source_path_exists(source, **kwargs):
+        """
+        Checks if the given source path exists. If the source is not a PathLike object,
+        the method logs this information (if a logger is provided) and assumes the
+        source path is valid.
+
+        :param source: The source path to be checked. It can be an object implementing
+            os.PathLike interface.
+        :type source: os.PathLike or any
+        :param kwargs: Optional keyword arguments. Can include:
+            - logger (optional): A logger instance to log debug messages when source is
+              not a PathLike object.
+        :type kwargs: dict
+        :return: A boolean value indicating whether the source path exists if it is a
+            PathLike object, or True if it is not a PathLike object.
+        :rtype: bool
+        """
+        logger = kwargs.get("logger", None)
+        if isinstance(source, PathLike):
+            if not Path(source).exists():
+                return False
+        else:
+            if logger is not None and hasattr(logger, "debug"):
+                logger.debug(f"source {source} is not a PathLike object, returning True")
+        return True
 
 
 class _InputHelpers(_PathHelpers):
@@ -146,6 +187,9 @@ class ComparerFactory(_InputHelpers):
 
     @classmethod
     def inst_comparer_class(cls, source: Any, target: Any, **kwargs):
+        if not cls._source_path_exists(source, **kwargs):
+            raise FileNotFoundError(f"source file {source} does not exist")
+
         source_is_json = cls._is_json_input(source)
         source_is_archive = cls._is_archive_input(source)
         source_is_directory = cls._is_directory_input(source)
@@ -159,7 +203,7 @@ class ComparerFactory(_InputHelpers):
             inst = cls._archive_src_targets(source, target, **kwargs)
 
         if source_is_directory:
-            return cls._directory_src_targets(source, target, **kwargs)
+            inst = cls._directory_src_targets(source, target, **kwargs)
 
         if inst:
             return inst
